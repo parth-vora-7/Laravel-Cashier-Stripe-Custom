@@ -68,18 +68,9 @@ class RegisterController extends Controller
             'password' => bcrypt($data['password']),
             ]);
 
-        $token = $data['stripeToken'];
-
-        dump($user);
-        try {
-            $user->subscription($data['plane'])->create($token,[
-                'email' => $user->email
-                ]);
-            return back()->with('success','Subscription is completed.');
-        } catch (Exception $e) {
-            return back()->with('success',$e->getMessage());
-        }
-
-        //return $user;
+        $stripeToken = $data['stripeToken'];
+        
+        $user->newSubscription('main', $data['plan'])->create($stripeToken);
+        return $user;
     }
 }

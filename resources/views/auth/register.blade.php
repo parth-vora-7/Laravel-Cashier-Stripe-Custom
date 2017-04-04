@@ -61,9 +61,9 @@
                         </div>
 
                         <div class="form-group">
-                            {!! Form::label('plane', 'Select Plan:', ['class' => 'col-md-4 control-label']) !!}
+                            {!! Form::label('plan', 'Select Plan:', ['class' => 'col-md-4 control-label']) !!}
                             <div class="col-md-6">
-                                {!! Form::select('plane', ['weekly' => 'Weekly ($5)', 'montly' => 'Montly ($10)'], 'Book', [
+                                {!! Form::select('plan', ['weekly' => 'Weekly ($20)', 'monthly' => 'Monthly ($100)', 'yearly' => 'Yearly ($1000)'], 'Book', [
                                 'class'                       => 'form-control',
                                 'required'                    => 'required',
                                 ]) !!}
