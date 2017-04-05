@@ -63,7 +63,7 @@
                         <div class="form-group">
                             {!! Form::label('plan', 'Select Plan:', ['class' => 'col-md-4 control-label']) !!}
                             <div class="col-md-6">
-                                {!! Form::select('plan', ['weekly' => 'Weekly ($20)', 'monthly' => 'Monthly ($100)', 'yearly' => 'Yearly ($1000)'], 'Book', [
+                                {!! Form::select('plan', ['daily' => 'Daily ($5)', 'weekly' => 'Weekly ($20)', 'monthly' => 'Monthly ($100)', 'yearly' => 'Yearly ($1000)'], 'Book', [
                                 'class'                       => 'form-control',
                                 'required'                    => 'required',
                                 ]) !!}
@@ -100,7 +100,6 @@
                             </div>
                         </div>
 
-
                         <div class="form-group">
                            {!! Form::label(null, 'Ex. Month', ['class' => 'col-md-4 control-label']) !!}
                            <div class="col-md-6">
@@ -124,6 +123,15 @@
                  </div>
 
                  <div class="form-group">
+                    {!! Form::label(null, 'Coupon', ['class' => 'col-md-4 control-label']) !!}
+                    <div class="col-md-6">
+                        {!! Form::text('coupon', null, [
+                        'class'                         => 'form-control',
+                        ]) !!}
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
                         <button type="submit" class="btn btn-primary">
                             Register

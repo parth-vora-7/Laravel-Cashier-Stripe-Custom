@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use DB;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -51,6 +54,8 @@ class RegisterController extends Controller
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
+            'plan' => 'required',
+            'stripeToken' => 'required'
             ]);
     }
 
@@ -62,15 +67,44 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            ]);
+        DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => bcrypt($data['password']),
+                ]);
 
-        $stripeToken = $data['stripeToken'];
-        
-        $user->newSubscription('main', $data['plan'])->create($stripeToken);
-        return $user;
+            $stripeToken = $data['stripeToken'];
+
+            try {
+                $subscription = $user->newSubscription('main', $data['plan']);
+
+                if(isset($data['coupon'])) {
+                    $subscription = $subscription->withCoupon($data['coupon']);
+                }
+
+                $subscription = $subscription->create($stripeToken);
+            } catch(Exception $e) {
+                return back()->withErrors($e->getMessage())->withInput();
+            }
+
+            return $user;
+        });
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        event(new Registered($user = $this->create($request->all())));
+
+        return $this->registered($request, $user)
+        ?: redirect($this->redirectPath());
     }
 }
