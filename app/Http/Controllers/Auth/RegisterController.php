@@ -67,29 +67,31 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        DB::transaction(function () use ($data) {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => bcrypt($data['password']),
-                ]);
+        DB::beginTransaction();
 
-            $stripeToken = $data['stripeToken'];
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+            ]);
 
-            try {
-                $subscription = $user->newSubscription('main', $data['plan']);
+        $stripeToken = $data['stripeToken'];
 
-                if(isset($data['coupon'])) {
-                    $subscription = $subscription->withCoupon($data['coupon']);
-                }
+        try {
+            $subscription = $user->newSubscription('main', $data['plan']);
 
-                $subscription = $subscription->create($stripeToken);
-            } catch(Exception $e) {
-                return back()->withErrors($e->getMessage())->withInput();
+            if(isset($data['coupon'])) {
+                $subscription = $subscription->withCoupon($data['coupon']);
             }
 
-            return $user;
-        });
+            $subscription = $subscription->create($stripeToken);
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollBack();
+            return ['stripe_errors' => $e->getMessage()];
+        }
+
+        return $user;
     }
 
     /**
@@ -104,7 +106,11 @@ class RegisterController extends Controller
 
         event(new Registered($user = $this->create($request->all())));
 
-        return $this->registered($request, $user)
-        ?: redirect($this->redirectPath());
+        if($user instanceof User) {
+            return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());   
+        } else {
+            return back()->withErrors($user)->withInput();
+        }
     }
 }

@@ -8,6 +8,14 @@
                 <div class="panel-heading">Register</div>
                 <div class="panel-body">
                     <form id="payment-form" class="form-horizontal" role="form" method="POST" action="{{ route('register') }}">
+                        @if($stripe_errors = $errors->get('stripe_errors'))
+                        <div class="alert alert-success alert-danger">
+                            @foreach($stripe_errors as $error)
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            {{ $error }}
+                            @endforeach
+                        </div>
+                        @endif
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
@@ -101,8 +109,8 @@
                         </div>
 
                         <div class="form-group">
-                           {!! Form::label(null, 'Ex. Month', ['class' => 'col-md-4 control-label']) !!}
-                           <div class="col-md-6">
+                         {!! Form::label(null, 'Ex. Month', ['class' => 'col-md-4 control-label']) !!}
+                         <div class="col-md-6">
                             {!! Form::selectMonth(null, null, [
                             'class'                 => 'form-control',
                             'required'              => 'required',
@@ -112,35 +120,35 @@
                     </div>
 
                     <div class="form-group">
-                       {!! Form::label(null, 'Ex. Year', ['class' => 'col-md-4 control-label']) !!}
-                       <div class="col-md-6">
-                         {!! Form::selectYear(null, date('Y'), date('Y') + 10, null, [
-                         'class'             => 'form-control',
-                         'required'          => 'required',
-                         'data-stripe'       => 'exp-year'
-                         ]) !!}
-                     </div>
-                 </div>
+                     {!! Form::label(null, 'Ex. Year', ['class' => 'col-md-4 control-label']) !!}
+                     <div class="col-md-6">
+                       {!! Form::selectYear(null, date('Y'), date('Y') + 10, null, [
+                       'class'             => 'form-control',
+                       'required'          => 'required',
+                       'data-stripe'       => 'exp-year'
+                       ]) !!}
+                   </div>
+               </div>
 
-                 <div class="form-group">
-                    {!! Form::label(null, 'Coupon', ['class' => 'col-md-4 control-label']) !!}
-                    <div class="col-md-6">
-                        {!! Form::text('coupon', null, [
-                        'class'                         => 'form-control',
-                        ]) !!}
-                    </div>
+               <div class="form-group">
+                {!! Form::label(null, 'Coupon', ['class' => 'col-md-4 control-label']) !!}
+                <div class="col-md-6">
+                    {!! Form::text('coupon', null, [
+                    'class'                         => 'form-control',
+                    ]) !!}
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">
-                            Register
-                        </button>
-                    </div>
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-4">
+                    <button type="submit" class="btn btn-primary">
+                        Register
+                    </button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
+</div>
 </div>
 </div>
 </div>
